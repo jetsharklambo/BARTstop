@@ -1,0 +1,170 @@
+
+<style>
+/* Card styling */
+.train-card {
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Typography */
+.destination-column {
+  font-size: 1.4em;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+/* Spacing */
+.spacing-xs { margin-top: 4px; }
+
+/* Dividers */
+.divider-footer { border-color: rgba(255,255,255,0.09); }
+
+/* Time badges */
+.times-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.time-badge {
+  background: white;
+  border-radius: 5px;
+  padding: 8px 6px;
+  color: #000;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  white-space: nowrap;
+}
+</style>
+
+{% assign station = root.station[0] %}
+{% assign pst_offset = 3600 | times: -8 %}
+{% assign now_utc = "now" | date: "%s" %}
+{% assign now_pst = now_utc | plus: pst_offset %}
+
+{% comment %} Convert bart_train_lines array to string for filtering {% endcomment %}
+{% assign bart_train_lines_raw = trmnl.plugin_settings.custom_fields_values.bart_train_lines %}
+{% if bart_train_lines_raw %}
+  {% assign bart_train_lines_str = bart_train_lines_raw | join: "," %}
+{% else %}
+  {% assign bart_train_lines_str = "" %}
+{% endif %}
+
+{% comment %} Count total available unique train lines for smart filter display {% endcomment %}
+{% assign total_available_lines = "" %}
+{% if station.etd %}
+  {% for etd in station.etd %}
+    {% assign line_abbr = etd.abbreviation %}
+    {% unless total_available_lines contains line_abbr %}
+      {% assign total_available_lines = total_available_lines | append: line_abbr | append: "," %}
+    {% endunless %}
+  {% endfor %}
+{% endif %}
+
+<div class="title_bar">
+  <img class="image" src="/images/plugins/trmnl--render.svg">
+  <span class="title">{{ station.name }} BART</span>
+  <span class="instance">
+    {% assign direction = trmnl.plugin_settings.custom_fields_values.bart_direction %}
+    {% assign total_lines_array = total_available_lines | split: ',' %}
+    {% assign filter_lines_array = bart_train_lines_str | split: ',' %}
+    {% assign has_line_filter = false %}
+    {% if bart_train_lines_str and bart_train_lines_str != '' and filter_lines_array.size < total_lines_array.size %}
+      {% assign has_line_filter = true %}
+    {% endif %}
+
+    {% if direction and direction != "" %}
+      {% if direction == 'n' or direction == 'N' %}North{% elsif direction == 's' or direction == 'S' %}South{% else %}{{ direction | capitalize }}{% endif %}
+    {% endif %}
+    {% if has_line_filter %}
+      {% if direction and direction != "" %} · {% endif %}{{ bart_train_lines_str }}
+    {% endif %}
+  </span>
+</div>
+<div class="layout layout--col gap--small">
+  <div class="header">
+    {% if bart_direction and bart_direction != "" %}
+      <div class="label label--small text--white spacing-xs">
+        Direction: {{ bart_direction | capitalize }}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="layout layout--col gap--small">
+    {% assign destinations_shown = "" %}
+    {% assign card_count = 0 %}
+
+    {% if station.etd %}
+      {% for etd in station.etd %}
+        {% if card_count < 2 %}
+        {% assign line_abbr = etd.abbreviation %}
+
+        <!-- Skip if train line filter exists and this line is not in it -->
+        {% if bart_train_lines_str and bart_train_lines_str != '' %}
+          {% assign filter_string = ',' | append: bart_train_lines_str | append: ',' %}
+          {% assign search_string = ',' | append: line_abbr | append: ',' %}
+          {% unless filter_string contains search_string %}
+            {% continue %}
+          {% endunless %}
+        {% endif %}
+
+        {% unless destinations_shown contains line_abbr %}
+          <!-- Build sorted time badges for this destination -->
+          {% assign time_badges_html = "" %}
+          {% for minute in (0..60) %}
+            {% for est in etd.estimate %}
+              {% assign est_minutes = est.minutes | plus: 0 %}
+              {% if est.minutes == 'Leaving' %}
+                {% assign est_minutes = 0 %}
+              {% endif %}
+              {% if est_minutes == minute %}
+                {% if est.minutes == 'Leaving' or est.minutes == '0' %}
+                  {% assign arrival_seconds = 0 %}
+                {% else %}
+                  {% assign arrival_seconds = est.minutes | times: 60 %}
+                {% endif %}
+                {% assign arrival_timestamp = now_pst | plus: arrival_seconds %}
+                {% assign arrival_time_str = arrival_timestamp | date: "%-I:%M %p" %}
+                {% assign time_badges_html = time_badges_html | append: '<div class="time-badge">' | append: arrival_time_str | append: '</div>' %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+
+          <div class="item bg--black train-card">
+           <div class="value value--small text--gray-60">
+                {{ etd.abbreviation }}
+              </div>
+            <div class="times-row">
+              {{ time_badges_html }}
+            </div>
+          </div>
+          {% assign destinations_shown = destinations_shown | append: line_abbr | append: "," %}
+          {% assign card_count = card_count | plus: 1 %}
+        {% endunless %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% if destinations_shown == "" %}
+      <div class="item bg--black train-card">
+        <div class="content layout--col gap--small" style="width: 100%; text-align: center;">
+          <div class="value value--xlarge text--white">⚠️</div>
+          <div class="label label--small text--gray-40">No trains available</div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="footer">
+    <div class="divider divider-footer"></div>
+    {% if last_updated %}
+      <div class="label label--small text--gray-60">Updated {{ last_updated }}</div>
+    {% endif %}
+  </div>
+</div>
