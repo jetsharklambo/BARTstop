@@ -196,6 +196,7 @@ Public Domain - feel free to modify and distribute
 - Inspired by [BARTcom-TRMNL](https://github.com/jetsharklambo/BARTcom-TRMNL)
 - BART API provided by [Bay Area Rapid Transit](https://www.bart.gov/)
 - Built for [TRMNL](https://usetrmnl.com/)
+- Icon by [Jamison Weiser](https://thenounproject.com/creator/jamison/)
 
 ## Support
 
@@ -220,6 +221,7 @@ https://github.com/jetsharklambo/BARTstop/issues
 - Real-time train arrivals with line indicators
 - Direction filtering support
 - Store-ready optimization (≤6 inline styles per template)
+
 
 
 
