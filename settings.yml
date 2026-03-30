@@ -4,10 +4,12 @@ no_screen_padding: 'no'
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
+framework_version: 2.3.7
+serverless_language: 
 polling_url: "{% if bart_direction and bart_direction != '' and bart_direction != 'Any' %}\r\nhttps://api.bart.gov/api/etd.aspx?cmd=etd&orig={{ bart_origin_station }}&dir={{ bart_direction }}&key=MW9S-E7SL-26DU-VV8V&json=y\r\n{% else %}\r\nhttps://api.bart.gov/api/etd.aspx?cmd=etd&orig={{ bart_origin_station }}&key=MW9S-E7SL-26DU-VV8V&json=y\r\n{% endif %}"
 polling_headers: ''
 polling_body: ''
-id: 180254
+id: 268594
 custom_fields:
 - keyname: bart_origin_station
   field_type: select
@@ -117,5 +119,5 @@ custom_fields:
   github_url: https://github.com/jetsharklambo/BARTstop
   learn_more_url: https://maximo.is/jetsharklambo
   email_address: jetsharklambo+trmnl@gmail.com
-name: FRVL Trmnl
-refresh_interval: 30
+name: "[Copy] BARTstop"
+refresh_interval: 15

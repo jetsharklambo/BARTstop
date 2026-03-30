@@ -1,47 +1,3 @@
-<style>
-/* Card styling */
-.train-card {
-  border-radius: 12px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-/* Typography */
-.destination-column {
-  font-size: 1.4em;
-  font-weight: bold;
-  letter-spacing: 0.3px;
-  min-width: 80px;
-  flex-shrink: 0;
-}
-
-/* Spacing */
-.spacing-xs { margin-top: 4px; }
-
-/* Dividers */
-.divider-footer { border-color: rgba(255,255,255,0.09); }
-
-/* Time badges */
-.times-row {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  flex: 1;
-}
-.time-badge {
-  background: white;
-  border-radius: 5px;
-  padding: 8px 6px;
-  color: #000;
-  font-family: sans-serif;
-  font-weight: bold;
-  font-size: 14px;
-  white-space: nowrap;
-}
-</style>
-
 {% assign station = root.station[0] %}
 {% assign pst_offset = 3600 | times: -8 %}
 {% assign now_utc = "now" | date: "%s" %}
@@ -66,30 +22,11 @@
   {% endfor %}
 {% endif %}
 
-<div class="title_bar">
-  <img class="image" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4xIgogICB4PSIwcHgiCiAgIHk9IjBweCIKICAgdmlld0JveD0iLTkuNjkzIDAuMDYzIDk2LjY1ODAwMSAxMDAiCiAgIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgLTkuNjkzIDAuMDYzIDk2LjY1OSAxMDAiCiAgIHhtbDpzcGFjZT0icHJlc2VydmUiCiAgIGlkPSJzdmc4IgogICBzb2RpcG9kaTpkb2NuYW1lPSJub3VuLXRyYWluLTE3MDcuc3ZnIgogICB3aWR0aD0iOTYuNjU3OTk3IgogICBoZWlnaHQ9IjEwMCIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS4yIChkYzJhZWRhZjAzLCAyMDIyLTA1LTE1KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcwogICAgIGlkPSJkZWZzMTIiIC8+PHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcxMCIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiMwMDAwMDAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMC4yNSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZGVza2NvbG9yPSIjZDFkMWQxIgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBpbmtzY2FwZTp6b29tPSIxLjg4OCIKICAgICBpbmtzY2FwZTpjeD0iNDguMTk5MTUzIgogICAgIGlua3NjYXBlOmN5PSI0Ny42Njk0OTIiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjExNzQiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9Ii0xMSIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTExIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnOCIgLz48cGF0aAogICAgIGQ9Ik0gODYuMDIyLDQ2Ljc5NiA4MS4yNDMsMTMuMzI3IEMgODAuNzI0LDkuNyA3Ny42MTYsNS4zODggNzQuMzM3LDMuNzQ4IGMgMCwwIC03LjM3MSwtMy42ODUgLTM0LjAyOSwtMy42ODUgLTI2LjY2NywwIC0zNy4zNzEsMy42ODUgLTM3LjM3MSwzLjY4NSAtMy4yOCwxLjY0IC02LjM4OSw1Ljk1MiAtNi45MDcsOS41NzkgbCAtNC43NzksMzMuNDY5IGMgLTAuNTE5LDMuNjI3IC0wLjk0NCw5LjYwMiAtMC45NDQsMTMuMjY4IDAsMy42NjYgMS4zNDYsOS4zNDMgMi45NzgsMTIuNjIyIGwgMC43MDQsMS40MDcgYyAxLjY0NywzLjI3OSA1Ljg5Myw2LjY5NyA5LjQ1MSw3LjU3OSBsIDMuNTM1LDAuODkgdiA3LjQ5NDAwMiBMIDMuNjQsMTAwLjA2MyBoIDYuNjY3IGwgMi4yMiwtNi42NjY5OTggaCA1Mi4yMTkgbCAyLjIyLDYuNjY2OTk4IGggNi42NjcgTCA3MC4zLDkwLjA1NjAwMiBWIDgyLjU2MiBsIDMuNTM0LC0wLjg5IGMgMy41NTgsLTAuODgyIDcuODEyLC00LjMgOS40NTEsLTcuNTc5IGwgMC42OTUsLTEuNDA3IGMgMS42NCwtMy4yNzkgMi45ODUsLTguOTU2IDIuOTg1LC0xMi42MjIgMCwtMy42NjYgLTAuNDI0LC05LjY0MSAtMC45NDMsLTEzLjI2OCB6IG0gLTgwLjcxOSwyNi42IGMgLTIuNzYxLDAgLTQuOTk2LC0yLjI0MiAtNC45OTYsLTUuMDA0IDAsLTIuNzYxIDIuMjM1LC01LjAwNCA0Ljk5NiwtNS4wMDQgMi43NjEsMCA1LjAwNCwyLjI0MyA1LjAwNCw1LjAwNCAwLDIuNzYyIC0yLjI0Myw1LjAwNCAtNS4wMDQsNS4wMDQgeiBNIDQyLjUyNyw1MC43MjkgYyAwLDEuNDY2IC0xLjE5OSwyLjY2NCAtMi42NjksMi42NjQgSCAyLjYwNCBjIC0xLjQ3LDAgLTIuNTIxLC0xLjE4NyAtMi4zNDQsLTIuNjQ1IEwgNC41NzUsMTYuMDQyIGMgMC4xODYsLTEuNDU0IDEuNTMyLC0yLjY0NSAyLjk5MywtMi42NDUgaCAzMi4yODkgYyAxLjQ2MiwwIDIuNjY5LDEuMTk5IDIuNjY5LDIuNjY0IHYgMzQuNjY4IHogbSAyOS40NDIsMjIuNjY3IGMgLTIuNzYxLDAgLTUuMDA0LC0yLjI0MiAtNS4wMDQsLTUuMDA0IDAsLTIuNzYxIDIuMjQzLC01LjAwNCA1LjAwNCwtNS4wMDQgMi43NjIsMCA0Ljk5NiwyLjI0MyA0Ljk5Niw1LjAwNCAxMGUtNCwyLjc2MiAtMi4yMzQsNS4wMDQgLTQuOTk2LDUuMDA0IHoiCiAgICAgaWQ9InBhdGgyIiAvPjwvc3ZnPgo=">
-  <span class="title">{{ station.name }} BART</span>
-  <span class="instance">
-    {% assign direction = trmnl.plugin_settings.custom_fields_values.bart_direction %}
-    {% assign total_lines_array = total_available_lines | split: ',' %}
-    {% assign filter_lines_array = bart_train_lines_str | split: ',' %}
-    {% assign has_line_filter = false %}
-    {% if bart_train_lines_str and bart_train_lines_str != '' and filter_lines_array.size < total_lines_array.size %}
-      {% assign has_line_filter = true %}
-    {% endif %}
 
-    {% if direction and direction != "" %}
-      {% if direction == 'n' or direction == 'N' %}North{% elsif direction == 's' or direction == 'S' %}South{% else %}{{ direction | capitalize }}{% endif %}
-    {% endif %}
-    {% if has_line_filter %}
-      {% if direction and direction != "" %} · {% endif %}{{ bart_train_lines_str }}
-    {% endif %}
-  </span>
-</div> 
 <div class="layout layout--col gap--small">
   <div class="header">
     {% if bart_direction and bart_direction != "" %}
-      <div class="label label--small text--gray-60 spacing-xs">
+      <div class="label label--small text--gray-60 mt--1">
         Direction: {{ bart_direction | capitalize }}
       </div>
     {% endif %}
@@ -114,33 +51,29 @@
           {% endif %}
 
           {% unless destinations_shown contains line_abbr %}
-            <!-- Build sorted time badges for this destination -->
-            {% assign time_badges_html = "" %}
-            {% for minute in (0..60) %}
-              {% for est in etd.estimate %}
-                {% assign est_minutes = est.minutes | plus: 0 %}
-                {% if est.minutes == 'Leaving' %}
-                  {% assign est_minutes = 0 %}
-                {% endif %}
-                {% if est_minutes == minute %}
-                  {% if est.minutes == 'Leaving' or est.minutes == '0' %}
-                    {% assign arrival_seconds = 0 %}
-                  {% else %}
-                    {% assign arrival_seconds = est.minutes | times: 60 %}
-                  {% endif %}
-                  {% assign arrival_timestamp = now_pst | plus: arrival_seconds %}
-                  {% assign arrival_time_str = arrival_timestamp | date: "%-I:%M %p" %}
-                  {% assign time_badges_html = time_badges_html | append: '<div class="time-badge">' | append: arrival_time_str | append: '</div>' %}
-                {% endif %}
-              {% endfor %}
-            {% endfor %}
-
-            <div class="item bg--black train-card">
-              <div class="value value--small text--gray-60">
+            <div class="item bg--black rounded--medium p--3 flex gap--small">
+              <div class="value value--small text--white" style="letter-spacing: 0.3px;">
                 {{ etd.abbreviation }}
               </div>
-              <div class="times-row">
-                {{ time_badges_html }}
+              <div class="flex gap--xsmall flex--wrap" style="flex: 1;">
+                {% comment %} Render time badges in chronological order {% endcomment %}
+                {% for minute in (0..60) %}
+                  {% for est in etd.estimate %}
+                    {% assign est_minutes = est.minutes | plus: 0 %}
+                    {% if est.minutes == 'Leaving' %}
+                      {% assign est_minutes = 0 %}
+                    {% endif %}
+                    {% if est_minutes == minute %}
+                      {% if est.minutes == 'Leaving' or est.minutes == '0' %}
+                        {% assign arrival_seconds = 0 %}
+                      {% else %}
+                        {% assign arrival_seconds = est.minutes | times: 60 %}
+                      {% endif %}
+                      {% assign arrival_timestamp = now_pst | plus: arrival_seconds %}
+                      <span class="label bg--white rounded--small p--1 pt--2 text--black">{{ arrival_timestamp | date: "%-I:%M %p" }}</span>
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
               </div>
             </div>
             {% assign destinations_shown = destinations_shown | append: line_abbr | append: "," %}
@@ -151,8 +84,8 @@
     {% endif %}
 
     {% if card_count == 0 %}
-      <div class="item bg--black train-card" style="grid-column: 1 / -1;">
-        <div class="content layout--col gap--small" style="width: 100%; text-align: center;">
+      <div class="item bg--black rounded--medium p--3 col--span-full">
+        <div class="content layout--col gap--small text--center stretch-x">
           <div class="value value--xlarge text--white">⚠️</div>
           <div class="label label--small text--gray-40">No trains available</div>
         </div>
@@ -161,10 +94,29 @@
   </div>
 
   <div class="footer">
-    <div class="divider divider-footer"></div>
+    <div class="divider"></div>
     {% if last_updated %}
       <div class="label label--small text--gray-60">Updated {{ last_updated }}</div>
     {% endif %}
   </div>
+</div>
+<div class="title_bar rounded bg--white" style="border: 2px solid #000";> 
+  <img class="image image-stroke--small" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4xIgogICB4PSIwcHgiCiAgIHk9IjBweCIKICAgdmlld0JveD0iLTkuNjkzIDAuMDYzIDk2LjY1ODAwMSAxMDAiCiAgIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgLTkuNjkzIDAuMDYzIDk2LjY1OSAxMDAiCiAgIHhtbDpzcGFjZT0icHJlc2VydmUiCiAgIGlkPSJzdmc4IgogICBzb2RpcG9kaTpkb2NuYW1lPSJub3VuLXRyYWluLTE3MDcuc3ZnIgogICB3aWR0aD0iOTYuNjU3OTk3IgogICBoZWlnaHQ9IjEwMCIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS4yIChkYzJhZWRhZjAzLCAyMDIyLTA1LTE1KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcwogICAgIGlkPSJkZWZzMTIiIC8+PHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcxMCIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiMwMDAwMDAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMC4yNSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZGVza2NvbG9yPSIjZDFkMWQxIgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBpbmtzY2FwZTp6b29tPSIxLjg4OCIKICAgICBpbmtzY2FwZTpjeD0iNDguMTk5MTUzIgogICAgIGlua3NjYXBlOmN5PSI0Ny42Njk0OTIiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjExNzQiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9Ii0xMSIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTExIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnOCIgLz48cGF0aAogICAgIGQ9Ik0gODYuMDIyLDQ2Ljc5NiA4MS4yNDMsMTMuMzI3IEMgODAuNzI0LDkuNyA3Ny42MTYsNS4zODggNzQuMzM3LDMuNzQ4IGMgMCwwIC03LjM3MSwtMy42ODUgLTM0LjAyOSwtMy42ODUgLTI2LjY2NywwIC0zNy4zNzEsMy42ODUgLTM3LjM3MSwzLjY4NSAtMy4yOCwxLjY0IC02LjM4OSw1Ljk1MiAtNi45MDcsOS41NzkgbCAtNC43NzksMzMuNDY5IGMgLTAuNTE5LDMuNjI3IC0wLjk0NCw5LjYwMiAtMC45NDQsMTMuMjY4IDAsMy42NjYgMS4zNDYsOS4zNDMgMi45NzgsMTIuNjIyIGwgMC43MDQsMS40MDcgYyAxLjY0NywzLjI3OSA1Ljg5Myw2LjY5NyA5LjQ1MSw3LjU3OSBsIDMuNTM1LDAuODkgdiA3LjQ5NDAwMiBMIDMuNjQsMTAwLjA2MyBoIDYuNjY3IGwgMi4yMiwtNi42NjY5OTggaCA1Mi4yMTkgbCAyLjIyLDYuNjY2OTk4IGggNi42NjcgTCA3MC4zLDkwLjA1NjAwMiBWIDgyLjU2MiBsIDMuNTM0LC0wLjg5IGMgMy41NTgsLTAuODgyIDcuODEyLC00LjMgOS40NTEsLTcuNTc5IGwgMC42OTUsLTEuNDA3IGMgMS42NCwtMy4yNzkgMi45ODUsLTguOTU2IDIuOTg1LC0xMi42MjIgMCwtMy42NjYgLTAuNDI0LC05LjY0MSAtMC45NDMsLTEzLjI2OCB6IG0gLTgwLjcxOSwyNi42IGMgLTIuNzYxLDAgLTQuOTk2LC0yLjI0MiAtNC45OTYsLTUuMDA0IDAsLTIuNzYxIDIuMjM1LC01LjAwNCA0Ljk5NiwtNS4wMDQgMi43NjEsMCA1LjAwNCwyLjI0MyA1LjAwNCw1LjAwNCAwLDIuNzYyIC0yLjI0Myw1LjAwNCAtNS4wMDQsNS4wMDQgeiBNIDQyLjUyNyw1MC43MjkgYyAwLDEuNDY2IC0xLjE5OSwyLjY2NCAtMi42NjksMi42NjQgSCAyLjYwNCBjIC0xLjQ3LDAgLTIuNTIxLC0xLjE4NyAtMi4zNDQsLTIuNjQ1IEwgNC41NzUsMTYuMDQyIGMgMC4xODYsLTEuNDU0IDEuNTMyLC0yLjY0NSAyLjk5MywtMi42NDUgaCAzMi4yODkgYyAxLjQ2MiwwIDIuNjY5LDEuMTk5IDIuNjY5LDIuNjY0IHYgMzQuNjY4IHogbSAyOS40NDIsMjIuNjY3IGMgLTIuNzYxLDAgLTUuMDA0LC0yLjI0MiAtNS4wMDQsLTUuMDA0IDAsLTIuNzYxIDIuMjQzLC01LjAwNCA1LjAwNCwtNS4wMDQgMi43NjIsMCA0Ljk5NiwyLjI0MyA0Ljk5Niw1LjAwNCAxMGUtNCwyLjc2MiAtMi4yMzQsNS4wMDQgLTQuOTk2LDUuMDA0IHoiCiAgICAgaWQ9InBhdGgyIiAvPjwvc3ZnPgo=">
+  <span class="title">{{ station.name }} BART</span>
+  <span class="instance">
+    {% assign direction = trmnl.plugin_settings.custom_fields_values.bart_direction %}
+    {% assign total_lines_array = total_available_lines | split: ',' %}
+    {% assign filter_lines_array = bart_train_lines_str | split: ',' %}
+    {% assign has_line_filter = false %}
+    {% if bart_train_lines_str and bart_train_lines_str != '' and filter_lines_array.size < total_lines_array.size %}
+      {% assign has_line_filter = true %}
+    {% endif %}
 
+    {% if direction and direction != "" %}
+      {% if direction == 'n' or direction == 'N' %}North{% elsif direction == 's' or direction == 'S' %}South{% else %}{{ direction | capitalize }}{% endif %}
+    {% endif %}
+    {% if has_line_filter %}
+      {% if direction and direction != "" %} · {% endif %}{{ bart_train_lines_str }}
+    {% endif %}
+  </span>
 </div>
