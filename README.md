@@ -12,7 +12,7 @@ A TRMNL e-ink display plugin that shows real-time train arrivals at any BART (Ba
 - **Customizable badges** - show platform, bike availability, delays, and cancellations (full and half_vertical layouts)
 - **Multiple layout options** for different TRMNL screen sizes
 - **Zero infrastructure** - no backend server required, calls BART API directly
-- **Store-ready** - optimized with 6 or fewer inline styles per template
+
 
 ## Layouts
 
@@ -22,7 +22,7 @@ Choose from 4 responsive layouts:
 
 ### Full (4-column grid)
 Best for: Full-screen displays showing up to 12 trains
-- Large time display (1.9em)
+- Large time display 
 - Detailed train info with customizable badges (platform, bike, delay, cancel)
 - Shows first train for each unique line, then fills remaining slots
 
@@ -132,23 +132,6 @@ Filters only appear in the titlebar instance when they're actively filtering tra
 
 This smart display ensures you always know when filters are active without cluttering the interface.
 
-## Available Train Lines
-
-Select from these train lines in the filter (or choose "No filters" to show all):
-
-| Abbreviation | Destination |
-|--------------|-------------|
-| RICH | Richmond |
-| MLBR | Millbrae |
-| DUBL | Dublin/Pleasanton |
-| BERY | Berryessa/North San José |
-| DALY | Daly City |
-| WARM | Warm Springs/South Fremont |
-| ANTC | Antioch |
-| PITT | Pittsburg/Bay Point |
-| SFIA | SFO International Airport |
-| OAKL | Oakland Airport |
-
 ## Available Badges
 
 For **full** and **half_vertical** layouts, choose which information badges to display:
@@ -207,7 +190,9 @@ https://github.com/jetsharklambo/BARTstop/issues
 
 ## Version History
 
-### v1.1.0 (2025-01-23)
+### v1.2.0 (2026-03-29)
+
+### v1.1.0 (2026-01-23)
 - Added smart train line filtering (filter by specific lines)
 - Added customizable badge visibility (platform, bike, delay, cancel)
 - Moved filters to titlebar instance for cleaner display
@@ -217,7 +202,7 @@ https://github.com/jetsharklambo/BARTstop/issues
 - Smart filter display (only shows when actively filtering)
 - Improved direction field (North/South instead of n/s)
 
-### v1.0.0 (2025-01-18)
+### v1.0.0 (2025-11-25)
 - Initial release
 - 4 responsive layouts (full, half_horizontal, half_vertical, quadrant)
 - Real-time train arrivals with line indicators
