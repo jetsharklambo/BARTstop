@@ -1,7 +1,51 @@
 {% assign station = root.station[0] %}
-{% assign pst_offset = 3600 | times: -8 %}
+
+{% comment %} Calculate Pacific time offset with automatic DST detection {% endcomment %}
 {% assign now_utc = "now" | date: "%s" %}
-{% assign now_pst = now_utc | plus: pst_offset %}
+{% assign current_year = "now" | date: "%Y" | plus: 0 %}
+{% assign current_month = "now" | date: "%-m" | plus: 0 %}
+{% assign current_day = "now" | date: "%-d" | plus: 0 %}
+
+{% comment %} Calculate DST start: 2nd Sunday in March {% endcomment %}
+{% assign march_1_timestamp = current_year | append: "-03-01" | date: "%s" %}
+{% assign march_1_day_of_week = march_1_timestamp | date: "%w" | plus: 0 %}
+{% if march_1_day_of_week == 0 %}
+  {% assign days_to_first_sunday = 0 %}
+{% else %}
+  {% assign days_to_first_sunday = 7 | minus: march_1_day_of_week %}
+{% endif %}
+{% assign dst_start_day = days_to_first_sunday | plus: 8 %}
+
+{% comment %} Calculate DST end: 1st Sunday in November {% endcomment %}
+{% assign nov_1_timestamp = current_year | append: "-11-01" | date: "%s" %}
+{% assign nov_1_day_of_week = nov_1_timestamp | date: "%w" | plus: 0 %}
+{% if nov_1_day_of_week == 0 %}
+  {% assign days_to_first_sunday_nov = 0 %}
+{% else %}
+  {% assign days_to_first_sunday_nov = 7 | minus: nov_1_day_of_week %}
+{% endif %}
+{% assign dst_end_day = days_to_first_sunday_nov | plus: 1 %}
+
+{% comment %} Determine if we're in DST {% endcomment %}
+{% assign in_dst = false %}
+{% if current_month > 3 and current_month < 11 %}
+  {% assign in_dst = true %}
+{% elsif current_month == 3 and current_day >= dst_start_day %}
+  {% assign in_dst = true %}
+{% elsif current_month == 11 and current_day < dst_end_day %}
+  {% assign in_dst = true %}
+{% endif %}
+
+{% comment %} Set offset: PDT (-7) or PST (-8) {% endcomment %}
+{% if in_dst %}
+  {% assign pacific_offset = 3600 | times: -7 %}
+{% else %}
+  {% assign pacific_offset = 3600 | times: -8 %}
+{% endif %}
+{% assign now_pacific = now_utc | plus: pacific_offset %}
+
+{% comment %} Get max trains setting with default of 12 {% endcomment %}
+{% assign max_trains = trmnl.plugin_settings.custom_fields_values.max_trains | default: 12 | plus: 0 %}
 
 {% comment %} Convert bart_train_lines array to string for filtering {% endcomment %}
 {% assign bart_train_lines_raw = trmnl.plugin_settings.custom_fields_values.bart_train_lines %}
@@ -26,19 +70,19 @@
 <div class="layout layout--col gap--small">
   <div class="header">
     {% if bart_direction and bart_direction != "" %}
-      <div class="label label--small text--white mt--1">
+      <div class="label label--small text--white">
         Direction: {{ bart_direction | capitalize }}
       </div>
     {% endif %}
   </div>
 
-
+  <div class="grid grid--cols-1 lg:grid--cols-1 gap--small">
     {% assign destinations_shown = "" %}
     {% assign card_count = 0 %}
 
     {% if station.etd %}
       {% for etd in station.etd %}
-        {% if card_count < 2 %}
+        {% if card_count < max_trains %}
         {% assign line_abbr = etd.abbreviation %}
 
         <!-- Skip if train line filter exists and this line is not in it -->
@@ -51,11 +95,11 @@
         {% endif %}
 
         {% unless destinations_shown contains line_abbr %}
-          <div class="item bg--black rounded--medium p--3 flex gap--small">
+          <div class="item bg--black rounded--medium p--1 flex gap--small">
             <div class="value value--small text--white" style="letter-spacing: 0.3px;">
               {{ etd.abbreviation }}
             </div>
-            <div class="flex gap--xsmall flex--wrap" style="flex: 1;">
+            <div class="flex gap--small flex--wrap" style="flex: 1;">
               {% comment %} Render time badges in chronological order {% endcomment %}
               {% for minute in (0..60) %}
                 {% for est in etd.estimate %}
@@ -69,8 +113,8 @@
                     {% else %}
                       {% assign arrival_seconds = est.minutes | times: 60 %}
                     {% endif %}
-                    {% assign arrival_timestamp = now_pst | plus: arrival_seconds %}
-                    <span class="label bg--white rounded--small p--1 pt--2 text--black">{{ arrival_timestamp | date: "%-I:%M %p" }}</span>
+                    {% assign arrival_timestamp = now_pacific | plus: arrival_seconds %}
+                    <span class="label bg--white rounded--small p--1"><span class="text--black">{{ arrival_timestamp | date: "%-I:%M %p" }}</span></span>
                   {% endif %}
                 {% endfor %}
               {% endfor %}
@@ -84,19 +128,19 @@
     {% endif %}
 
     {% if destinations_shown == "" %}
-      <div class="item bg--black rounded--medium p--3">
+      <div class="item bg--black rounded--medium p--1 m--1 col--span-full">
         <div class="content layout--col gap--small text--center stretch-x">
           <div class="value value--xlarge text--white">⚠️</div>
-          <div class="label label--small text--gray-40">No trains available</div>
+          <div class="label label--small text--gray-55">No trains available</div>
         </div>
       </div>
     {% endif %}
-
+  </div>
 
   <div class="footer">
     <div class="divider"></div>
     {% if last_updated %}
-      <div class="label label--small text--gray-60">Updated {{ last_updated }}</div>
+      <div class="label label--small text--gray-55">Updated {{ last_updated }}</div>
     {% endif %}
   </div>
 </div>

@@ -1,7 +1,49 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 {% assign station = root.station[0] %}
-{% assign pst_offset = 3600 | times: -8 %}
+
+{% comment %} Calculate Pacific time offset with automatic DST detection {% endcomment %}
 {% assign now_utc = "now" | date: "%s" %}
-{% assign now_pst = now_utc | plus: pst_offset %}
+{% assign current_year = "now" | date: "%Y" | plus: 0 %}
+{% assign current_month = "now" | date: "%-m" | plus: 0 %}
+{% assign current_day = "now" | date: "%-d" | plus: 0 %}
+
+{% comment %} Calculate DST start: 2nd Sunday in March {% endcomment %}
+{% assign march_1_timestamp = current_year | append: "-03-01" | date: "%s" %}
+{% assign march_1_day_of_week = march_1_timestamp | date: "%w" | plus: 0 %}
+{% if march_1_day_of_week == 0 %}
+  {% assign days_to_first_sunday = 0 %}
+{% else %}
+  {% assign days_to_first_sunday = 7 | minus: march_1_day_of_week %}
+{% endif %}
+{% assign dst_start_day = days_to_first_sunday | plus: 8 %}
+
+{% comment %} Calculate DST end: 1st Sunday in November {% endcomment %}
+{% assign nov_1_timestamp = current_year | append: "-11-01" | date: "%s" %}
+{% assign nov_1_day_of_week = nov_1_timestamp | date: "%w" | plus: 0 %}
+{% if nov_1_day_of_week == 0 %}
+  {% assign days_to_first_sunday_nov = 0 %}
+{% else %}
+  {% assign days_to_first_sunday_nov = 7 | minus: nov_1_day_of_week %}
+{% endif %}
+{% assign dst_end_day = days_to_first_sunday_nov | plus: 1 %}
+
+{% comment %} Determine if we're in DST {% endcomment %}
+{% assign in_dst = false %}
+{% if current_month > 3 and current_month < 11 %}
+  {% assign in_dst = true %}
+{% elsif current_month == 3 and current_day >= dst_start_day %}
+  {% assign in_dst = true %}
+{% elsif current_month == 11 and current_day < dst_end_day %}
+  {% assign in_dst = true %}
+{% endif %}
+
+{% comment %} Set offset: PDT (-7) or PST (-8) {% endcomment %}
+{% if in_dst %}
+  {% assign pacific_offset = 3600 | times: -7 %}
+{% else %}
+  {% assign pacific_offset = 3600 | times: -8 %}
+{% endif %}
+{% assign now_pacific = now_utc | plus: pacific_offset %}
 
 {% comment %} Convert badge_visibility array to string - using proper TRMNL path {% endcomment %}
 {% assign badge_visibility_raw = trmnl.plugin_settings.custom_fields_values.badge_visibility %}
@@ -10,6 +52,9 @@
 {% else %}
   {% assign badge_visibility_str = "platform,bike,delay,cancel" %}
 {% endif %}
+
+{% comment %} Get max trains setting with default of 12 {% endcomment %}
+{% assign max_trains = trmnl.plugin_settings.custom_fields_values.max_trains | default: 12 | plus: 0 %}
 
 {% comment %} Convert bart_train_lines array to string for filtering {% endcomment %}
 {% assign bart_train_lines_raw = trmnl.plugin_settings.custom_fields_values.bart_train_lines %}
@@ -39,18 +84,18 @@
     {% endif %}
   </div>
 
-  <div class="grid grid--cols-2 gap--small">
+  <div class="grid grid--cols-2 lg:grid--cols-3 lg:portrait:grid--cols-2 gap--small">
     {% assign train_count = 0 %}
 
     {% if station.etd %}
       <!-- Display trains in chronological order by iterating through minute values -->
       {% for minute in (0..60) %}
-        {% if train_count >= 6 %}
+        {% if train_count >= max_trains %}
           {% break %}
         {% endif %}
 
         {% for etd in station.etd %}
-          {% if train_count >= 6 %}
+          {% if train_count >= max_trains %}
             {% break %}
           {% endif %}
 
@@ -67,7 +112,7 @@
 
           {% if etd.estimate %}
             {% for est in etd.estimate %}
-              {% if train_count >= 6 %}
+              {% if train_count >= max_trains %}
                 {% break %}
               {% endif %}
 
@@ -83,13 +128,13 @@
                       {{ etd.abbreviation }}
                     </div>
 
-                    <div class="value value--medium text--white" style="line-height: 1.0; font-weight: bold;">
+                    <div class="value value--small text--white" style="line-height: 1.0;">
                       {% if est.minutes == 'Leaving' or est.minutes == '0' %}
                         {% assign arrival_seconds = 0 %}
                       {% else %}
                         {% assign arrival_seconds = est.minutes | times: 60 %}
                       {% endif %}
-                      {% assign arrival_timestamp = now_pst | plus: arrival_seconds %}
+                      {% assign arrival_timestamp = now_pacific | plus: arrival_seconds %}
                       {% assign arrival_time_str = arrival_timestamp | date: "%-I:%M %p" %}
                       {{ arrival_time_str }}
                     </div>
@@ -99,27 +144,52 @@
                     {% unless badge_visibility_str contains "no_badges" %}
                       <div class="flex gap--xsmall">
                         {% if badge_visibility_str contains "platform" %}
-                          <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1 text--black">PLAT {{ est.platform }}</span>
+                          {% assign platform_num = est.platform | plus: 0 %}
+                          {% if platform_num >= 1 and platform_num <= 4 %}
+                            <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1">
+                              <i class="bi bi-{{ platform_num }}-square-fill text--black"></i>
+                            </span>
+                          {% else %}
+                            <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1">
+                              <i class="bi bi-square-fill text--black"></i> <span class="text--black">{{ est.platform }}</span>
+                            </span>
+                          {% endif %}
                         {% endif %}
 
                         {% if badge_visibility_str contains "bike" %}
                           {% if est.bikeflag == "1" %}
-                            <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1 text--black">BIKE</span>
+                            <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1">
+                              <i class="bi bi-bicycle text--black"></i>
+                            </span>
                           {% else %}
-                            <span class="label label--small label--inverted text--gray-40">BIKE</span>
+                            <span class="label label--small label--inverted text--gray-55">
+                              <i class="bi bi-bicycle"></i>
+                            </span>
                           {% endif %}
                         {% endif %}
 
                         {% assign delay_num = est.delay | plus: 0 %}
-                        {% if est.canceled == "1" %}
-                          {% if badge_visibility_str contains "cancel" %}
-                            <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1 text--black">CANCEL</span>
-                          {% endif %}
-                        {% elsif badge_visibility_str contains "delay" %}
+                        {% if badge_visibility_str contains "delay" %}
                           {% if delay_num > 0 %}
-                            <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1 text--black">DELAY</span>
+                            <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1">
+                              <i class="bi bi-alarm-fill text--black"></i>
+                            </span>
                           {% else %}
-                            <span class="label label--small label--inverted text--gray-40">DELAY</span>
+                            <span class="label label--small label--inverted text--gray-55">
+                              <i class="bi bi-alarm-fill"></i>
+                            </span>
+                          {% endif %}
+                        {% endif %}
+
+                        {% if badge_visibility_str contains "cancel" %}
+                          {% if est.canceled == "1" %}
+                            <span class="label bg--white rounded--small p--0.8 pt--1 pl--1 pr--1">
+                              <i class="bi bi-x-circle-fill text--black"></i>
+                            </span>
+                          {% else %}
+                            <span class="label label--small label--inverted text--gray-55">
+                              <i class="bi bi-x-circle-fill"></i>
+                            </span>
                           {% endif %}
                         {% endif %}
                       </div>
@@ -138,7 +208,7 @@
       <div class="item bg--black rounded--medium p--2 col--span-full">
         <div class="content layout--col gap--small">
           <div class="value value--xlarge text--white">⚠️</div>
-          <div class="label label--small text--gray-40">No trains available</div>
+          <div class="label label--small text--gray-55">No trains available</div>
         </div>
       </div>
     {% endif %}
@@ -147,7 +217,7 @@
   <div class="footer">
     <div class="divider"></div>
     {% if last_updated %}
-      <div class="label label--small text--gray-60">Updated {{ last_updated }}</div>
+      <div class="label label--small text--gray-55">Updated {{ last_updated }}</div>
     {% endif %}
   </div>
 </div>
